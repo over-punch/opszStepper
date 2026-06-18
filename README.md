@@ -213,4 +213,4 @@ Bump the `?v=N` cache-buster on the image URLs in this README after regenerating
 
 ---
 
-Current version: 1.0.15
+Current version: 1.0.16
