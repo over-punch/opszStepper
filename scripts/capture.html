@@ -1,0 +1,135 @@
+<!doctype html>
+<!-- README Studio capture page for opszStepper.
+     Renders the same word at three sizes with the matching Cormorant optical cut,
+     plus a one-cut vs. opszStepper comparison. Screenshotted by scripts/capture.mjs. -->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<!-- Three real optical cuts of Cormorant — the same families the live demo uses.
+     Micro  → Cormorant SC (small caps, drawn for small sizes)
+     Text   → Cormorant Garamond (text optical size)
+     Display→ Cormorant (display-oriented cut) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@300;400&family=Cormorant+Garamond:wght@300;400&family=Cormorant+SC:wght@300;400&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+	:root {
+		--bg: oklch(0.13 0.045 95);
+		--fg: oklch(0.94 0.02 95);
+		--muted: oklch(0.72 0.03 95);
+		--accent: oklch(0.78 0.12 75);
+		--card: oklch(0.17 0.04 95);
+	}
+	* { margin: 0; padding: 0; box-sizing: border-box; }
+	html, body { background: transparent; }
+	body {
+		font-family: "Inter", system-ui, sans-serif;
+		color: var(--fg);
+		padding: 40px;
+		display: flex;
+		flex-direction: column;
+		gap: 48px;
+		align-items: flex-start;
+	}
+	.scene {
+		background: var(--bg);
+		border-radius: 18px;
+		padding: 44px 48px;
+		border: 1px solid oklch(0.28 0.04 95);
+	}
+	.label {
+		font-size: 12px;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: var(--muted);
+		font-weight: 500;
+		margin-bottom: 6px;
+	}
+	.sub { font-size: 13px; color: var(--muted); }
+
+	/* ── Hero: one sentence, three sizes, each with its correct cut ── */
+	#hero { width: 1100px; }
+	#hero .row { display: flex; align-items: baseline; gap: 28px; padding: 14px 0; }
+	#hero .row + .row { border-top: 1px solid oklch(0.24 0.035 95); }
+	#hero .meta { width: 168px; flex: none; }
+	#hero .meta .cut { font-size: 14px; font-weight: 500; color: var(--accent); }
+	#hero .meta .px { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+	#hero .sample { line-height: 1.05; color: var(--fg); }
+	.micro   { font-family: "Cormorant SC", serif; font-weight: 400; }
+	.text    { font-family: "Cormorant Garamond", serif; font-weight: 400; }
+	.display { font-family: "Cormorant", serif; font-weight: 300; }
+	#hero .s-micro   { font-size: 15px; letter-spacing: 0.04em; }
+	#hero .s-text    { font-size: 24px; }
+	#hero .s-display { font-size: 60px; }
+
+	/* ── Comparison: one cut at all sizes vs. opszStepper ── */
+	#compare { width: 1100px; display: flex; flex-direction: column; gap: 8px; }
+	#compare .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 18px; }
+	#compare .col-head { font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+	#compare .col-head .bad { color: oklch(0.7 0.12 30); }
+	#compare .col-head .good { color: var(--accent); }
+	#compare .stack { display: flex; flex-direction: column; gap: 16px; }
+	#compare .line { line-height: 1; }
+	#compare .l-sm { font-size: 15px; }
+	#compare .l-md { font-size: 24px; }
+	#compare .l-lg { font-size: 52px; }
+	#compare .divider { width: 1px; background: oklch(0.26 0.04 95); }
+</style>
+</head>
+<body>
+
+	<!-- HERO -->
+	<div class="scene" id="hero">
+		<div class="label">opszStepper · the right optical cut at every size</div>
+		<div class="row">
+			<div class="meta"><div class="cut">Micro cut</div><div class="px">15px · &lt; 16px</div></div>
+			<div class="sample micro s-micro">Typography</div>
+		</div>
+		<div class="row">
+			<div class="meta"><div class="cut">Text cut</div><div class="px">24px · 16–36px</div></div>
+			<div class="sample text s-text">Typography</div>
+		</div>
+		<div class="row">
+			<div class="meta"><div class="cut">Display cut</div><div class="px">60px · ≥ 36px</div></div>
+			<div class="sample display s-display">Typography</div>
+		</div>
+	</div>
+
+	<!-- COMPARISON -->
+	<div class="scene" id="compare">
+		<div class="label">why it matters</div>
+		<div class="sub">The same family scaled to every size vs. the correct optical cut per size.</div>
+		<div class="grid">
+			<div>
+				<div class="col-head"><span class="bad">✕ One cut, scaled</span> — Display at all sizes</div>
+				<div class="stack">
+					<div class="line display l-sm">Editorial</div>
+					<div class="line display l-md">Editorial</div>
+					<div class="line display l-lg">Editorial</div>
+				</div>
+			</div>
+			<div style="position:relative">
+				<div class="col-head"><span class="good">✓ opszStepper</span> — cut swapped per size</div>
+				<div class="stack">
+					<div class="line micro l-sm" style="letter-spacing:0.04em">Editorial</div>
+					<div class="line text l-md">Editorial</div>
+					<div class="line display l-lg">Editorial</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+<script>
+	// Signal readiness once all three optical-cut fonts have loaded and painted.
+	window.__ready = (async () => {
+		await document.fonts.ready;
+		// Explicitly load each cut at a used size so networkidle + ready never races a swap font.
+		await Promise.all([
+			document.fonts.load('400 15px "Cormorant SC"'),
+			document.fonts.load('400 24px "Cormorant Garamond"'),
+			document.fonts.load('300 60px "Cormorant"'),
+		]);
+	})();
+</script>
+</body>
+</html>

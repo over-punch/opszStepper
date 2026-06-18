@@ -8,6 +8,8 @@
 
 TypeScript · Zero dependencies · React + Vanilla JS
 
+![opszStepper applies the Micro, Text, and Display cuts of Cormorant to the word "Typography" at 15px, 24px, and 60px — each size gets the cut drawn for it](https://raw.githubusercontent.com/Liiift-Studio/opszStepper/main/assets/hero.png?v=1)
+
 ---
 
 ## Install
@@ -25,6 +27,27 @@ npm install @liiift-studio/opszstepper
 ### What are optical cuts?
 
 Many professional editorial typefaces ship as a family of separate font files — each drawn specifically for a different size range. Halyard has Halyard Micro (captions and footnotes), Halyard Text (body), and Halyard Display (headlines). Tiempos has Tiempos Fine, Tiempos Text, and Tiempos Headline. Each cut has different contrast, spacing, and stroke weight tuned for its intended size. CSS has no mechanism to switch between them automatically — `font-optical-sizing: auto` only controls the `opsz` axis of a single variable font file. opszStepper fills that gap.
+
+Scaling one cut to every size is the problem opszStepper avoids. On the left, a single Display cut is used at all sizes — fine when large, but its high contrast and tight spacing turn spindly and fragile when shrunk. On the right, opszStepper swaps in the cut drawn for each size:
+
+![Comparison: the left column scales a single Display cut to small, medium, and large sizes, where it reads thin and fragile when small; the right column shows opszStepper swapping to the Micro, Text, and Display cuts so each size is legible](https://raw.githubusercontent.com/Liiift-Studio/opszStepper/main/assets/compare.png?v=1)
+
+### Two modes: family hot-swap or `opsz` axis
+
+opszStepper covers both ways type families ship optical sizes:
+
+1. **Multi-family hot-swap** *(the primary case)* — separate font files per cut (Halyard Micro / Text / Display). Give each cut a different `family`; opszStepper sets `font-family` to the matching cut as `font-size` crosses each threshold. Every example below uses this mode.
+2. **Single variable font, `opsz` axis** — one variable font with an `opsz` axis (Fraunces, Recursive, Amstelvar). Use the *same* `family` in every cut and add an `opszValue` per cut; opszStepper writes `font-variation-settings: "opsz" <value>` instead of swapping files. Optional `opszMin`/`opszMax` clamp the value to the font's fvar range:
+
+```ts
+cuts: [
+  { family: 'Fraunces, serif', maxSize: 13,              opszValue: 9,  opszMin: 9, opszMax: 144 },
+  { family: 'Fraunces, serif', minSize: 13, maxSize: 28, opszValue: 24, opszMin: 9, opszMax: 144 },
+  { family: 'Fraunces, serif', minSize: 28,              opszValue: 72, opszMin: 9, opszMax: 144 },
+]
+```
+
+This steps the axis at discrete thresholds with hysteresis, which is useful when you want explicit control over the `opsz` value per size band rather than the browser's continuous `font-optical-sizing: auto`.
 
 ### React component
 
@@ -119,6 +142,8 @@ const opts: OpszStepperOptions = { cuts, hysteresis: 2 }
 | Option | Default | Description |
 |--------|---------|-------------|
 | `cuts` | *(required)* | Array of `OpszStepperCut` objects defining each optical size cut and the font-size range it applies to. Each cut has a `family` string (CSS `font-family` value), an optional `minSize` in px (inclusive, default `0`), and an optional `maxSize` in px (exclusive, default `Infinity`). Ranges should be contiguous and non-overlapping — see the cuts configuration guide below |
+| `cut.opszValue` | `undefined` | *(per-cut, `opsz`-axis mode only)* When set, opszStepper writes `font-variation-settings: "opsz" <value>` on the element instead of swapping `family`. Use with a single variable font shared across all cuts — see [Two modes](#two-modes-family-hot-swap-or-opsz-axis) |
+| `cut.opszMin` / `cut.opszMax` | `undefined` | *(per-cut, `opsz`-axis mode only)* Clamp the written `opszValue` to the font's fvar `opsz` axis range. Ignored unless `opszValue` is set |
 | `hysteresis` | `1` | Dead zone in px around each cut boundary. When font-size sits within `hysteresis` px of a threshold, the current cut is held rather than switching. Prevents oscillation when font-size is computed to hover right at a boundary due to sub-pixel rendering or responsive scaling. Increase to `2`–`4` if you observe rapid toggling |
 | `onCutChange` | `undefined` | Callback fired each time the active cut changes. Receives the newly applied `OpszStepperCut`. Useful for logging, analytics, or synchronising sibling elements |
 | `as` | `'p'` | HTML element to render. Accepts any valid React element type, e.g. `'h1'`, `'div'`, `'span'`. *(React component only)* |
@@ -165,6 +190,17 @@ A `ResizeObserver` watches the element for size changes. In responsive layouts, 
 
 The package itself has zero runtime dependencies. Do not remove this entry.
 
+### Regenerating the README visuals
+
+The hero and comparison images live in `assets/` and are produced by a committed, re-runnable harness in `scripts/` (it renders the three real Cormorant optical cuts in headless Chromium and screenshots each scene). `assets/` and `scripts/` are kept out of the npm tarball — the package ships `dist` only.
+
+```bash
+npm i -D playwright && npx playwright install chromium
+node scripts/capture.mjs   # writes assets/hero.png and assets/compare.png
+```
+
+Bump the `?v=N` cache-buster on the image URLs in this README after regenerating.
+
 ---
 
 ## Future improvements
@@ -177,4 +213,4 @@ The package itself has zero runtime dependencies. Do not remove this entry.
 
 ---
 
-Current version: 1.0.12
+Current version: 1.0.15
