@@ -35,7 +35,7 @@ export default function Home() {
 			{/* Demo */}
 			<section className="w-full max-w-2xl lg:max-w-5xl flex flex-col gap-4" aria-label="Live demo">
 				<h2 className="text-xs uppercase tracking-[0.18em] font-medium text-muted">Live demo — drag the sliders</h2>
-				<div className="rounded-xl -mx-8 px-8 py-8" style={{ background: "color-mix(in oklch, var(--foreground) 25%, transparent)", overflow: 'hidden' }}>
+				<div className="rounded-xl -mx-8 px-8 py-8" style={{ background: "var(--panel)", overflow: 'hidden' }}>
 					<Demo />
 				</div>
 			</section>

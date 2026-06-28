@@ -342,7 +342,7 @@ export default function Demo() {
 			</div>
 
 			{/* Demo text — font-size controlled by slider or cursor or gyro */}
-			<div className="rounded-lg p-6" style={{ background: 'color-mix(in oklch, var(--foreground) 20%, transparent)' }}>
+			<div className="rounded-lg p-6" style={{ background: 'var(--panel)' }}>
 				<OpszStepperText
 					cuts={CUTS}
 					hysteresis={dHysteresis}
