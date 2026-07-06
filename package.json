@@ -16,10 +16,11 @@
 	],
 	"scripts": {
 		"build": "vite build",
+		"build:webflow": "vite build --config vite.webflow.config.ts",
 		"test": "vitest run",
 		"test:run": "vitest run",
 		"typecheck": "tsc --noEmit",
-		"prepublishOnly": "npm run test && npm run build"
+		"prepublishOnly": "npm run test && npm run build && npm run build:webflow"
 	},
 	"peerDependencies": {
 		"react": ">=17",

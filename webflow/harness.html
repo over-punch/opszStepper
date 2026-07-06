@@ -1,0 +1,119 @@
+<!doctype html>
+<!-- opszStepper/webflow/harness.html — local proof page for the Webflow IIFE bundle.
+     Loads Fraunces (a variable font with an opsz axis) from Google Fonts, marks headings
+     with data-opszstepper, and drives the opsz axis from each element's computed font-size. -->
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>opszStepper — Webflow embed harness</title>
+
+	<!-- Fraunces exposes an `opsz` axis from 9 → 144, so a single family covers every cut. -->
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&display=swap"
+		rel="stylesheet"
+	/>
+
+	<style>
+		body {
+			margin: 0;
+			padding: 3rem clamp(1rem, 4vw, 4rem);
+			background: #f7f4ee;
+			color: #1a1712;
+			font-family: 'Fraunces', serif;
+			line-height: 1.25;
+		}
+		.note {
+			font-size: 15px;
+			max-width: 42rem;
+			margin: 0 0 2.5rem;
+			padding: 1rem 1.25rem;
+			background: #ede7db;
+			border-left: 3px solid #b9853f;
+			line-height: 1.5;
+		}
+		.small { font-size: 12px; }
+		.text { font-size: 20px; }
+		.display { font-size: 64px; font-weight: 600; }
+		.giant { font-size: 110px; font-weight: 600; }
+		h1, p { margin: 0 0 1.5rem; }
+		.resize {
+			font-size: 40px;
+			font-weight: 600;
+			width: 60%;
+			min-width: 8rem;
+			resize: horizontal;
+			overflow: auto;
+			padding: 0.5rem 0.75rem;
+			border: 1px dashed #b9853f;
+		}
+	</style>
+</head>
+<body>
+	<div class="note">
+		<strong>What "working" looks like:</strong> every element below shares one variable
+		font (Fraunces), but opszStepper writes a different <code>font-variation-settings: "opsz"</code>
+		value per element based on its computed <code>font-size</code>. Small text gets a low opsz
+		(sturdier, more open shapes); the giant heading gets a high opsz (finer, higher-contrast
+		display cut). Inspect any element in DevTools — the smaller sizes should carry
+		<code>"opsz" 9</code>–<code>24</code> and the large ones <code>"opsz" 72</code>–<code>144</code>.
+		Drag the dashed box's right edge to shrink it: if a media query changes its font-size
+		across a threshold, the ResizeObserver re-picks the cut live (with hysteresis so it
+		doesn't flicker at the boundary).
+	</div>
+
+	<!-- Shorthand form: one family + a "min-max:opsz" list, clamped to Fraunces' 9..144 axis. -->
+	<p
+		class="small"
+		data-opszstepper
+		data-os-family="'Fraunces', serif"
+		data-os-opsz="0-13:9, 13-28:16, 28-64:40, 64-:96"
+		data-os-opsz-min="9"
+		data-os-opsz-max="144"
+	>Small caption at 15px → low opsz for legibility.</p>
+
+	<p
+		class="text"
+		data-opszstepper
+		data-os-family="'Fraunces', serif"
+		data-os-opsz="0-13:9, 13-28:16, 28-64:40, 64-:96"
+		data-os-opsz-min="9"
+		data-os-opsz-max="144"
+	>Body text at 20px → a slightly higher opsz text cut.</p>
+
+	<h1
+		class="display"
+		data-opszstepper
+		data-os-family="'Fraunces', serif"
+		data-os-opsz="0-13:9, 13-28:16, 28-64:40, 64-:96"
+		data-os-opsz-min="9"
+		data-os-opsz-max="144"
+	>Display heading at 64px</h1>
+
+	<!-- JSON form: same effect expressed as an explicit cut array. -->
+	<h1
+		class="giant"
+		data-opszstepper
+		data-os-cuts='[
+			{ "family": "Fraunces, serif", "maxSize": 28, "opszValue": 16, "opszMin": 9, "opszMax": 144 },
+			{ "family": "Fraunces, serif", "minSize": 28, "maxSize": 80, "opszValue": 48, "opszMin": 9, "opszMax": 144 },
+			{ "family": "Fraunces, serif", "minSize": 80, "opszValue": 144, "opszMin": 9, "opszMax": 144 }
+		]'
+	>Giant 110px (JSON cuts)</h1>
+
+	<!-- Resize proof: change font-size via the box width crossing a breakpoint. -->
+	<div
+		class="resize"
+		data-opszstepper
+		data-os-family="'Fraunces', serif"
+		data-os-opsz="0-30:14, 30-:80"
+		data-os-opsz-min="9"
+		data-os-opsz-max="144"
+		data-os-hysteresis="2"
+	>Drag my right edge — resize me</div>
+
+	<script src="../dist/opszstepper.webflow.min.js"></script>
+</body>
+</html>
