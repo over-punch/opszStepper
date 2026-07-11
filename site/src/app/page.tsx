@@ -5,6 +5,7 @@ import ToolDirectory from "@/components/ToolDirectory"
 import { version } from "../../../package.json"
 import { version as siteVersion } from "../../package.json"
 import SiteFooter from "../components/SiteFooter"
+import PortsSection from "../components/PortsSection"
 import { MagnetChar } from "@liiift-studio/magnettype"
 
 export default function Home() {
@@ -133,6 +134,14 @@ import { OpszStepperText } from '@liiift-studio/opszstepper'
 					</div>
 				</div>
 			</section>
+
+			<PortsSection
+				npm="@liiift-studio/opszstepper"
+				bundle="opszstepper"
+				attr="data-opszstepper"
+				framerComponent="OpszStepper"
+				repo="Liiift-Studio/OpszStepper"
+			/>
 
 			<SiteFooter current="opszStepper" npmVersion={version} siteVersion={siteVersion} />
 
