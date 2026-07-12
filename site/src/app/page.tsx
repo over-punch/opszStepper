@@ -138,7 +138,7 @@ import { OpszStepperText } from '@liiift-studio/opszstepper'
 			<PortsSection
 				npm="@liiift-studio/opszstepper"
 				bundle="opszstepper"
-				attr="data-opszstepper"
+				attr="data-opszstepper" figma="full"
 				framerComponent="OpszStepper"
 				repo="Liiift-Studio/OpszStepper"
 			/>
