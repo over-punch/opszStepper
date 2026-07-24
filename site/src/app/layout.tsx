@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import "./globals.css"
 import { Inter, Cormorant, Cormorant_Garamond, Cormorant_SC } from "next/font/google"
+import SiteHeader from "../components/SiteHeader"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -68,6 +69,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 	return (
 		<html lang="en" className={`h-full antialiased ${FONT_CLASSES}`}>
 			<body className="min-h-full flex flex-col">
+				<SiteHeader current="opszStepper" githubUrl="https://github.com/Liiift-Studio/opszStepper" />
 				<script
 					type="application/ld+json"
 					dangerouslySetInnerHTML={{ __html: JSON.stringify({
