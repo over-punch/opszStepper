@@ -15,7 +15,7 @@ export default function Home() {
 			{/* Hero */}
 			<section className="w-full max-w-2xl lg:max-w-5xl flex flex-col gap-6" aria-labelledby="hero-heading">
 				<div className="flex flex-col gap-2">
-					<p className="text-xs uppercase tracking-[0.18em] font-medium text-muted">opszstepper</p>
+					<p className="text-xs uppercase tracking-[0.18em] font-medium text-muted">optical-size stepping</p>
 					<h1 id="hero-heading" className="text-4xl lg:text-8xl xl:text-9xl" style={{ fontFamily: "var(--font-cormorant-display), serif", fontVariationSettings: '"wght" 300', lineHeight: "1.05em" }}>
 						<MagnetChar as="span" minWeight={300} maxWeight={800} spreadRadius={220} fixedAxes={{ opsz: 144 }}>Optical cuts,</MagnetChar><br />
 						<MagnetChar as="span" minWeight={300} maxWeight={800} spreadRadius={220} fixedAxes={{ opsz: 144 }} style={{ color: "var(--foreground-subtle)", fontStyle: "italic" }}>on demand.</MagnetChar>
