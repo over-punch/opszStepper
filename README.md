@@ -4,7 +4,7 @@
 
 `font-optical-sizing: auto` only works for variable fonts with an `opsz` axis. opszStepper solves the other case: professional typeface families that ship separate font files for each optical size cut (Micro, Text, Display) with no axis at all. It automatically swaps the correct cut onto an element as its `font-size` changes.
 
-**[opszstepper.com](https://opszstepper.com)** · [npm](https://www.npmjs.com/package/@liiift-studio/opszstepper) · [GitHub](https://github.com/Liiift-Studio/OpszStepper)
+**[opszstepper.com](https://opszstepper.com)** · [npm](https://www.npmjs.com/package/@liiift-studio/opszstepper) · [GitHub](https://github.com/Liiift-Studio/opszStepper)
 
 TypeScript · Zero dependencies · React + Vanilla JS
 

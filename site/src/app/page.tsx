@@ -23,7 +23,7 @@ export default function Home() {
 				</div>
 				<div className="flex items-center gap-4">
 					<CopyInstall />
-					<a href="https://github.com/Liiift-Studio/OpszStepper" target="_blank" rel="noopener noreferrer" aria-label="OpszStepper on GitHub (opens in new tab)" className="text-sm text-muted hover:text-foreground transition-colors">GitHub ↗</a>
+					<a href="https://github.com/Liiift-Studio/opszStepper" target="_blank" rel="noopener noreferrer" aria-label="OpszStepper on GitHub (opens in new tab)" className="text-sm text-muted hover:text-foreground transition-colors">GitHub ↗</a>
 				</div>
 				<div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted tracking-wide">
 					<span>TypeScript</span><span aria-hidden="true">·</span><span>Zero dependencies</span><span aria-hidden="true">·</span><span>React + Vanilla JS</span>
