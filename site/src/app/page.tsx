@@ -122,7 +122,7 @@ import { OpszStepperText } from '@liiift-studio/opszstepper'
 						<p className="text-muted">Options</p>
 						<table className="w-full text-xs" aria-label="OpszStepper options reference">
 							<thead><tr className="text-subtle text-left"><th className="pb-2 pr-6 font-normal">Option</th><th className="pb-2 pr-6 font-normal">Default</th><th className="pb-2 font-normal">Description</th></tr></thead>
-							<tbody className="text-muted zebra-bleed">
+							<tbody className="text-muted zebra">
 								<tr className="hover:bg-foreground/5 transition-colors"><td className="py-2 pr-6 font-mono">cuts</td><td className="py-2 pr-6">required</td><td className="py-2">Array of <code className="font-mono">OpszStepperCut</code> objects, each with a <code className="font-mono">family</code> string and optional <code className="font-mono">minSize</code>/<code className="font-mono">maxSize</code> in px.</td></tr>
 								<tr className="hover:bg-foreground/5 transition-colors"><td className="py-2 pr-6 font-mono">cuts[n].opszValue</td><td className="py-2 pr-6">—</td><td className="py-2">Optional <code className="font-mono">opsz</code> axis value to write as <code className="font-mono">font-variation-settings</code>. Use for variable fonts instead of swapping <code className="font-mono">font-family</code>.</td></tr>
 								<tr className="hover:bg-foreground/5 transition-colors"><td className="py-2 pr-6 font-mono">cuts[n].opszMin / opszMax</td><td className="py-2 pr-6">—</td><td className="py-2">Clamp bounds for the <code className="font-mono">opsz</code> axis value, matching the font&apos;s <code className="font-mono">fvar</code> range.</td></tr>
