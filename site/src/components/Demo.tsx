@@ -2,6 +2,7 @@
 
 // Interactive demo: drag font-size slider, move cursor, tilt device, or simulate AR viewing distance to watch opszStepper hot-swap between Cormorant cuts
 import { useState, useDeferredValue, useEffect, useCallback, useMemo } from "react"
+import { useMediaQuery, useClientValue } from "@/lib/clientValue"
 import { OpszStepperText } from "@liiift-studio/opszstepper"
 import type { OpszStepperCut } from "@liiift-studio/opszstepper"
 
@@ -153,15 +154,10 @@ export default function Demo() {
 	)
 
 	// Detected capabilities — resolved client-side after mount
-	const [showCursor, setShowCursor] = useState(false)
-	const [showGyro, setShowGyro] = useState(false)
-
-	useEffect(() => {
-		const isHover = window.matchMedia('(hover: hover)').matches
-		const isTouch = window.matchMedia('(hover: none)').matches
-		setShowCursor(isHover)
-		setShowGyro(isTouch && 'DeviceOrientationEvent' in window)
-	}, [])
+	const showCursor = useMediaQuery('(hover: hover)')
+	const isTouch = useMediaQuery('(hover: none)')
+	const hasOrientation = useClientValue(() => 'DeviceOrientationEvent' in window, false)
+	const showGyro = isTouch && hasOrientation
 
 	// Effective font-size: distance-driven, gyro-driven, or slider-driven
 	const effectiveFontSize = distanceMode ? distanceFontSize : gyroMode ? gyroFontSize : fontSize
