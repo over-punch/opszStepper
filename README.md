@@ -210,7 +210,3 @@ Bump the `?v=N` cache-buster on the image URLs in this README after regenerating
 - **Multi-element sync** — a `syncGroup` option to tie multiple elements to the same active cut, so a heading and its pull-quote always use the same optical cut at all times
 - **Font preload hints** — automatically inject `<link rel="preload">` tags for all cut font files on first call, so the browser can fetch them before they are needed
 - **SSR hydration** — detect the correct cut server-side via a CSS custom property or data attribute so the initial render uses the right `font-family` without a post-hydration swap
-
----
-
-Current version: 1.0.16
