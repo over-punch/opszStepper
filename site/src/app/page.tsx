@@ -21,7 +21,7 @@ export default function Home() {
 						<MagnetChar as="span" minWeight={300} maxWeight={800} spreadRadius={220} fixedAxes={{ opsz: 144 }} style={{ color: "var(--foreground-subtle)", fontStyle: "italic" }}>on demand.</MagnetChar>
 					</h1>
 				</div>
-				<div className="flex items-center gap-4">
+				<div className="flex flex-wrap items-center gap-4">
 					<CopyInstall />
 					<a href="https://github.com/Liiift-Studio/opszStepper" target="_blank" rel="noopener noreferrer" aria-label="OpszStepper on GitHub (opens in new tab)" className="text-sm text-muted hover:text-foreground transition-colors">GitHub ↗</a>
 				</div>
