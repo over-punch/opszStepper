@@ -1,36 +1,29 @@
 import Demo from "@/components/Demo"
-import CopyInstall from "@/components/CopyInstall"
+import Hero from "@/components/Hero"
 import CodeBlock from "@/components/CodeBlock"
 import { version } from "../../../package.json"
 import { version as siteVersion } from "../../package.json"
 import SiteFooter from "../components/SiteFooter"
 import PortsSection from "../components/PortsSection"
-import { MagnetChar } from "@liiift-studio/magnettype"
 
 export default function Home() {
 	return (
 		<main className="flex flex-col items-center px-6 py-20 gap-24">
 
 			{/* Hero */}
-			<section className="w-full max-w-2xl lg:max-w-5xl flex flex-col gap-6" aria-labelledby="hero-heading">
-				<div className="flex flex-col gap-2">
-					<p className="text-xs uppercase tracking-[0.18em] font-medium text-muted">optical-size stepping</p>
-					<h1 id="hero-heading" className="text-4xl lg:text-8xl xl:text-9xl" style={{ fontFamily: "var(--font-cormorant-display), serif", fontVariationSettings: '"wght" 300', lineHeight: "1.05em" }}>
-						<MagnetChar as="span" minWeight={300} maxWeight={800} spreadRadius={220} fixedAxes={{ opsz: 144 }}>Optical cuts,</MagnetChar><br />
-						<MagnetChar as="span" minWeight={300} maxWeight={800} spreadRadius={220} fixedAxes={{ opsz: 144 }} style={{ color: "var(--foreground-subtle)", fontStyle: "italic" }}>on demand.</MagnetChar>
-					</h1>
-				</div>
-				<div className="flex flex-wrap items-center gap-4">
-					<CopyInstall />
-					<a href="https://github.com/Liiift-Studio/opszStepper" target="_blank" rel="noopener noreferrer" aria-label="OpszStepper on GitHub (opens in new tab)" className="text-sm text-muted hover:text-foreground transition-colors">GitHub ↗</a>
-				</div>
-				<div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted tracking-wide">
-					<span>TypeScript</span><span aria-hidden="true">·</span><span>Zero dependencies</span><span aria-hidden="true">·</span><span>React + Vanilla JS</span>
-				</div>
+			<Hero
+				eyebrow="optical-size stepping"
+				title={[{ text: "Optical cuts," }, { text: "on demand.", italic: true, subtle: true }]}
+				titleFontFamily="var(--font-cormorant-display), serif"
+				titleOpsz={null}
+				install="@liiift-studio/opszstepper"
+				github="https://github.com/Liiift-Studio/opszStepper"
+				tech={["TypeScript", "Zero dependencies", "React + Vanilla JS"]}
+			>
 				<p className="text-base leading-relaxed max-w-lg">
 					Type designers create separate optical-size cuts for the same reason optometrists prescribe different lenses for reading and driving — the geometry that works at 12px becomes wrong at 72px. Opsz Stepper detects the current font-size and hot-swaps to the correct cut, automatically.
 				</p>
-			</section>
+			</Hero>
 
 			{/* Demo */}
 			<section className="w-full max-w-2xl lg:max-w-5xl flex flex-col gap-4" aria-label="Live demo">
