@@ -1,10 +1,10 @@
 # opszStepper
 
-[![npm](https://img.shields.io/npm/v/%40liiift-studio%2Fopszstepper.svg)](https://www.npmjs.com/package/@liiift-studio/opszstepper) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![part of liiift type-tools](https://img.shields.io/badge/liiift-type--tools-blueviolet)](https://github.com/Liiift-Studio/type-tools)
+[![npm](https://img.shields.io/npm/v/%40liiift-studio%2Fopszstepper.svg)](https://www.npmjs.com/package/@overpunch/opszstepper) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![part of liiift type-tools](https://img.shields.io/badge/liiift-type--tools-blueviolet)](https://github.com/Liiift-Studio/type-tools)
 
 `font-optical-sizing: auto` only works for variable fonts with an `opsz` axis. opszStepper solves the other case: professional typeface families that ship separate font files for each optical size cut (Micro, Text, Display) with no axis at all. It automatically swaps the correct cut onto an element as its `font-size` changes.
 
-**[opszstepper.com](https://opszstepper.com)** · [npm](https://www.npmjs.com/package/@liiift-studio/opszstepper) · [GitHub](https://github.com/Liiift-Studio/opszStepper)
+**[opszstepper.com](https://opszstepper.com)** · [npm](https://www.npmjs.com/package/@overpunch/opszstepper) · [GitHub](https://github.com/Liiift-Studio/opszStepper)
 
 TypeScript · Zero dependencies · React + Vanilla JS
 
@@ -15,7 +15,7 @@ TypeScript · Zero dependencies · React + Vanilla JS
 ## Install
 
 ```bash
-npm install @liiift-studio/opszstepper
+npm install @overpunch/opszstepper
 ```
 
 ---
@@ -52,7 +52,7 @@ This steps the axis at discrete thresholds with hysteresis, which is useful when
 ### React component
 
 ```tsx
-import { OpszStepperText } from '@liiift-studio/opszstepper'
+import { OpszStepperText } from '@overpunch/opszstepper'
 
 <OpszStepperText
   cuts={[
@@ -68,7 +68,7 @@ import { OpszStepperText } from '@liiift-studio/opszstepper'
 ### React hook
 
 ```tsx
-import { useOpszStepper } from '@liiift-studio/opszstepper'
+import { useOpszStepper } from '@overpunch/opszstepper'
 
 // Inside a React component:
 const ref = useOpszStepper({
@@ -86,7 +86,7 @@ The hook starts a `ResizeObserver` on the element and re-evaluates the active cu
 ### Vanilla JS — with ResizeObserver
 
 ```ts
-import { startOpszStepper } from '@liiift-studio/opszstepper'
+import { startOpszStepper } from '@overpunch/opszstepper'
 
 const el = document.querySelector('p')
 
@@ -105,7 +105,7 @@ let stop = startOpszStepper(el, { cuts })
 ### Vanilla JS — one-shot
 
 ```ts
-import { applyOpszStepper } from '@liiift-studio/opszstepper'
+import { applyOpszStepper } from '@overpunch/opszstepper'
 
 const el = document.querySelector('p')
 
@@ -124,7 +124,7 @@ applyOpszStepper(el, {
 ### TypeScript
 
 ```ts
-import type { OpszStepperCut, OpszStepperOptions } from '@liiift-studio/opszstepper'
+import type { OpszStepperCut, OpszStepperOptions } from '@overpunch/opszstepper'
 
 const cuts: OpszStepperCut[] = [
   { family: 'Tiempos Fine, serif', maxSize: 13 },

@@ -3,8 +3,8 @@
 // Interactive demo: drag font-size slider, move cursor, tilt device, or simulate AR viewing distance to watch opszStepper hot-swap between Cormorant cuts
 import { useState, useDeferredValue, useEffect, useCallback, useMemo } from "react"
 import { useMediaQuery, useClientValue } from "@/lib/clientValue"
-import { OpszStepperText } from "@liiift-studio/opszstepper"
-import type { OpszStepperCut } from "@liiift-studio/opszstepper"
+import { OpszStepperText } from "@overpunch/opszstepper"
+import type { OpszStepperCut } from "@overpunch/opszstepper"
 
 /** Three Cormorant optical cuts loaded via next/font — keys must match CSS variable names */
 const CUTS: OpszStepperCut[] = [

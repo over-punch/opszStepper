@@ -16,7 +16,7 @@ export default function Home() {
 				title={[{ text: "Optical cuts," }, { text: "on demand.", italic: true, subtle: true }]}
 				titleFontFamily="var(--font-cormorant-display), serif"
 				titleOpsz={null}
-				install="@liiift-studio/opszstepper"
+				install="@overpunch/opszstepper"
 				github="https://github.com/Liiift-Studio/opszStepper"
 				tech={["TypeScript", "Zero dependencies", "React + Vanilla JS"]}
 			>
@@ -65,7 +65,7 @@ export default function Home() {
 				<div className="flex flex-col gap-8 text-sm">
 					<div className="flex flex-col gap-3">
 						<p className="text-muted">Drop-in component</p>
-						<CodeBlock code={`import { OpszStepperText } from '@liiift-studio/opszstepper'
+						<CodeBlock code={`import { OpszStepperText } from '@overpunch/opszstepper'
 
 <OpszStepperText cuts={[
   { family: 'Halyard Micro, sans-serif', maxSize: 13 },
@@ -77,14 +77,14 @@ export default function Home() {
 					</div>
 					<div className="flex flex-col gap-3">
 						<p className="text-muted">Hook — attach to any element</p>
-						<CodeBlock code={`import { useOpszStepper } from '@liiift-studio/opszstepper'
+						<CodeBlock code={`import { useOpszStepper } from '@overpunch/opszstepper'
 
 const ref = useOpszStepper({ cuts, hysteresis: 2, onCutChange: (cut) => console.log(cut) })
 <p ref={ref}>Your text</p>`} />
 					</div>
 					<div className="flex flex-col gap-3">
 						<p className="text-muted">Vanilla JS</p>
-						<CodeBlock code={`import { startOpszStepper, applyOpszStepper, removeOpszStepper } from '@liiift-studio/opszstepper'
+						<CodeBlock code={`import { startOpszStepper, applyOpszStepper, removeOpszStepper } from '@overpunch/opszstepper'
 
 const el = document.querySelector('h1')
 
@@ -100,7 +100,7 @@ removeOpszStepper(el) // restore original fontFamily`} />
 						<p className="text-muted">Variable font — single opsz axis</p>
 						<CodeBlock code={`// For variable fonts with an opsz axis (e.g. Fraunces, Amstelvar), set opszValue per cut.
 // The tool writes font-variation-settings: "opsz" <value> instead of swapping font-family.
-import { OpszStepperText } from '@liiift-studio/opszstepper'
+import { OpszStepperText } from '@overpunch/opszstepper'
 
 <OpszStepperText cuts={[
   { family: 'Fraunces, serif', maxSize: 13,            opszValue: 9,  opszMin: 9, opszMax: 144 },
@@ -128,7 +128,7 @@ import { OpszStepperText } from '@liiift-studio/opszstepper'
 			</section>
 
 			<PortsSection
-				npm="@liiift-studio/opszstepper"
+				npm="@overpunch/opszstepper"
 				bundle="opszstepper"
 				attr="data-opszstepper" figma="full"
 				framerComponent="OpszStepper"
