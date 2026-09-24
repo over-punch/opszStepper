@@ -17,7 +17,7 @@ export default function Home() {
 				titleFontFamily="var(--font-cormorant-display), serif"
 				titleOpsz={null}
 				install="@overpunch/opszstepper"
-				github="https://github.com/Liiift-Studio/opszStepper"
+				github="https://github.com/over-punch/opszStepper"
 				tech={["TypeScript", "Zero dependencies", "React + Vanilla JS"]}
 			>
 				<p className="text-base leading-relaxed max-w-lg">
@@ -132,7 +132,7 @@ import { OpszStepperText } from '@overpunch/opszstepper'
 				bundle="opszstepper"
 				attr="data-opszstepper" figma="full"
 				framerComponent="OpszStepper"
-				repo="Liiift-Studio/OpszStepper"
+				repo="over-punch/OpszStepper"
 			/>
 
 			<SiteFooter current="opszStepper" npmVersion={version} siteVersion={siteVersion} />

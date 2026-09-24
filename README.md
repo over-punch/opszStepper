@@ -1,14 +1,14 @@
 # opszStepper
 
-[![npm](https://img.shields.io/npm/v/%40liiift-studio%2Fopszstepper.svg)](https://www.npmjs.com/package/@overpunch/opszstepper) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![part of liiift type-tools](https://img.shields.io/badge/liiift-type--tools-blueviolet)](https://github.com/Liiift-Studio/type-tools)
+[![npm](https://img.shields.io/npm/v/%40overpunch%2Fopszstepper.svg)](https://www.npmjs.com/package/@overpunch/opszstepper) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![part of liiift type-tools](https://img.shields.io/badge/liiift-type--tools-blueviolet)](https://github.com/over-punch/type-tools)
 
 `font-optical-sizing: auto` only works for variable fonts with an `opsz` axis. opszStepper solves the other case: professional typeface families that ship separate font files for each optical size cut (Micro, Text, Display) with no axis at all. It automatically swaps the correct cut onto an element as its `font-size` changes.
 
-**[opszstepper.com](https://opszstepper.com)** · [npm](https://www.npmjs.com/package/@overpunch/opszstepper) · [GitHub](https://github.com/Liiift-Studio/opszStepper)
+**[opszstepper.com](https://opszstepper.com)** · [npm](https://www.npmjs.com/package/@overpunch/opszstepper) · [GitHub](https://github.com/over-punch/opszStepper)
 
 TypeScript · Zero dependencies · React + Vanilla JS
 
-![opszStepper applies the Micro, Text, and Display cuts of Cormorant to the word "Typography" at 15px, 24px, and 60px — each size gets the cut drawn for it](https://raw.githubusercontent.com/Liiift-Studio/opszStepper/main/assets/hero.png?v=1)
+![opszStepper applies the Micro, Text, and Display cuts of Cormorant to the word "Typography" at 15px, 24px, and 60px — each size gets the cut drawn for it](https://raw.githubusercontent.com/over-punch/opszStepper/main/assets/hero.png?v=1)
 
 ---
 
@@ -30,7 +30,7 @@ Many professional editorial typefaces ship as a family of separate font files �
 
 Scaling one cut to every size is the problem opszStepper avoids. On the left, a single Display cut is used at all sizes — fine when large, but its high contrast and tight spacing turn spindly and fragile when shrunk. On the right, opszStepper swaps in the cut drawn for each size:
 
-![Comparison: the left column scales a single Display cut to small, medium, and large sizes, where it reads thin and fragile when small; the right column shows opszStepper swapping to the Micro, Text, and Display cuts so each size is legible](https://raw.githubusercontent.com/Liiift-Studio/opszStepper/main/assets/compare.png?v=1)
+![Comparison: the left column scales a single Display cut to small, medium, and large sizes, where it reads thin and fragile when small; the right column shows opszStepper swapping to the Micro, Text, and Display cuts so each size is legible](https://raw.githubusercontent.com/over-punch/opszStepper/main/assets/compare.png?v=1)
 
 ### Two modes: family hot-swap or `opsz` axis
 

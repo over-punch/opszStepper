@@ -72,10 +72,10 @@
 	"homepage": "https://opszstepper.com",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/Liiift-Studio/opszStepper.git"
+		"url": "git+https://github.com/over-punch/opszStepper.git"
 	},
 	"bugs": {
-		"url": "https://github.com/Liiift-Studio/opszStepper/issues"
+		"url": "https://github.com/over-punch/opszStepper/issues"
 	},
 	"sideEffects": false,
 	"publishConfig": {

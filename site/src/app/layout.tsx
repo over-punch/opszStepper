@@ -69,7 +69,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 	return (
 		<html lang="en" className={`h-full antialiased ${FONT_CLASSES}`}>
 			<body className="min-h-full flex flex-col">
-				<SiteHeader current="opszStepper" githubUrl="https://github.com/Liiift-Studio/opszStepper" />
+				<SiteHeader current="opszStepper" githubUrl="https://github.com/over-punch/opszStepper" />
 				<script
 					type="application/ld+json"
 					dangerouslySetInnerHTML={{ __html: JSON.stringify({
