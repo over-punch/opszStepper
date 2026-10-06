@@ -37,7 +37,7 @@ Scaling one cut to every size is the problem opszStepper avoids. On the left, a 
 opszStepper covers both ways type families ship optical sizes:
 
 1. **Multi-family hot-swap** *(the primary case)* — separate font files per cut (Halyard Micro / Text / Display). Give each cut a different `family`; opszStepper sets `font-family` to the matching cut as `font-size` crosses each threshold. Every example below uses this mode.
-2. **Single variable font, `opsz` axis** — one variable font with an `opsz` axis (Fraunces, Recursive, Amstelvar). Use the *same* `family` in every cut and add an `opszValue` per cut; opszStepper writes `font-variation-settings: "opsz" <value>` instead of swapping files. Optional `opszMin`/`opszMax` clamp the value to the font's fvar range:
+2. **Single variable font, `opsz` axis** — one variable font with an `opsz` axis (Fraunces, Recursive, Amstelvar). Use the *same* `family` in every cut and add an `opszValue` per cut; opszStepper sets the `opsz` axis in `font-variation-settings` (keeping any other axes you've set, such as `wght`) instead of swapping files. Optional `opszMin`/`opszMax` clamp the value to the font's fvar range:
 
 ```ts
 cuts: [
@@ -81,12 +81,14 @@ const ref = useOpszStepper({
 return <p ref={ref}>{children}</p>
 ```
 
-The hook starts a `ResizeObserver` on the element and re-evaluates the active cut each time the element's size changes (which triggers a re-read of `font-size`). It restarts automatically when `cuts.length` or `hysteresis` changes, and cleans up on unmount.
+The hook starts the stepper on the element and re-evaluates the active cut whenever its font-size may have changed (see [How it works](#how-it-works)). It restarts when the cuts or `hysteresis` change, follows the element if React replaces it (a changed `as`, a conditional mount), always calls the latest `onCutChange`, and cleans up on unmount.
 
-### Vanilla JS — with ResizeObserver
+### Vanilla JS — live
+
+The main entry also exports the React hook and component, so it imports `react`. Without React installed, import from the React-free subpath `@overpunch/opszstepper/core`:
 
 ```ts
-import { startOpszStepper } from '@overpunch/opszstepper'
+import { startOpszStepper } from '@overpunch/opszstepper/core'
 
 const el = document.querySelector('p')
 
@@ -98,7 +100,7 @@ const cuts = [
 
 let stop = startOpszStepper(el, { cuts })
 
-// Later — stop the observer and restore original fontFamily:
+// Later — stop watching and restore the original styles:
 // stop()
 ```
 
@@ -117,7 +119,7 @@ applyOpszStepper(el, {
   ],
 })
 
-// Later — restore original fontFamily:
+// Later — restore the original styles:
 // removeOpszStepper(el)
 ```
 
@@ -141,10 +143,10 @@ const opts: OpszStepperOptions = { cuts, hysteresis: 2 }
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `cuts` | *(required)* | Array of `OpszStepperCut` objects defining each optical size cut and the font-size range it applies to. Each cut has a `family` string (CSS `font-family` value), an optional `minSize` in px (inclusive, default `0`), and an optional `maxSize` in px (exclusive, default `Infinity`). Ranges should be contiguous and non-overlapping — see the cuts configuration guide below |
-| `cut.opszValue` | `undefined` | *(per-cut, `opsz`-axis mode only)* When set, opszStepper writes `font-variation-settings: "opsz" <value>` on the element instead of swapping `family`. Use with a single variable font shared across all cuts — see [Two modes](#two-modes-family-hot-swap-or-opsz-axis) |
+| `cuts` | *(required)* | Array of `OpszStepperCut` objects defining each optical size cut and the font-size range it applies to. Each cut has a `family` string (CSS `font-family` value), an optional `minSize` in px (inclusive, default `0`), and an optional `maxSize` in px (exclusive, default `Infinity`). Ranges should be contiguous and non-overlapping. They can be listed in any order, and a cut with only `maxSize` starts where the previous one ends — see the cuts configuration guide below |
+| `cut.opszValue` | `undefined` | *(per-cut, `opsz`-axis mode only)* When set, opszStepper sets the `opsz` axis in the element's `font-variation-settings`, keeping its other axes. Use with a single variable font shared across all cuts — see [Two modes](#two-modes-family-hot-swap-or-opsz-axis) |
 | `cut.opszMin` / `cut.opszMax` | `undefined` | *(per-cut, `opsz`-axis mode only)* Clamp the written `opszValue` to the font's fvar `opsz` axis range. Ignored unless `opszValue` is set |
-| `hysteresis` | `1` | Dead zone in px around each cut boundary. When font-size sits within `hysteresis` px of a threshold, the current cut is held rather than switching. Prevents oscillation when font-size is computed to hover right at a boundary due to sub-pixel rendering or responsive scaling. Increase to `2`–`4` if you observe rapid toggling |
+| `hysteresis` | `1` | Dead zone in px around each cut boundary. When font-size sits within `hysteresis` px of a threshold, the current cut is held rather than switching. Prevents oscillation when font-size is computed to hover right at a boundary due to sub-pixel rendering or responsive scaling. Increase to `2`–`4` if you observe rapid toggling. A value larger than half the narrowest cut is reduced to that (with a warning), so a cut can't be skipped |
 | `onCutChange` | `undefined` | Callback fired each time the active cut changes. Receives the newly applied `OpszStepperCut`. Useful for logging, analytics, or synchronising sibling elements |
 | `as` | `'p'` | HTML element to render. Accepts any valid React element type, e.g. `'h1'`, `'div'`, `'span'`. *(React component only)* |
 
@@ -172,13 +174,15 @@ You can omit the smallest cut's `minSize` (defaults to `0`) and the largest cut'
 
 ## How it works
 
-`startOpszStepper` reads the element's computed `font-size` via `getComputedStyle(el).fontSize` and finds the matching cut. It then sets `el.style.fontFamily` to that cut's `family` string, overriding whatever the stylesheet specifies. The original `fontFamily` value is stored in a `WeakMap` keyed by element so it can be restored exactly when `removeOpszStepper` or the stop function is called.
+`startOpszStepper` reads the element's computed `font-size` via `getComputedStyle(el).fontSize` and finds the matching cut. It then sets `el.style.fontFamily` to that cut's `family` string, overriding whatever the stylesheet specifies. The original inline `font-family` and `font-variation-settings` (with any `!important`) are saved so they can be restored exactly when `removeOpszStepper` or the stop function is called. In family mode `font-variation-settings` is left alone.
 
-A `ResizeObserver` watches the element for size changes. In responsive layouts, `font-size` is typically driven by `clamp()`, viewport units, or container queries — all of which can change as the element or viewport resizes. Each observer callback re-reads `font-size` and applies hysteresis logic before switching cuts, so a cut swap only fires when the size has moved clearly past a threshold.
+A font-size can change without the element's box changing size (a fixed `line-height`, an inline `<span>`, a fixed-size box), so a `ResizeObserver` alone isn't enough. opszStepper re-checks when the element or its parent resizes (container queries), when a `class` or `style` attribute changes anywhere on the page, and when the window resizes (viewport units, media queries). All watched elements share these observers, and each check reads every font-size first and then writes the changed cuts, so a resize with thousands of elements costs one style recalculation. Hysteresis is applied before switching, so a swap only fires when the size has moved clearly past a threshold.
+
+**Limits:** a font-size change that comes from none of these (for example an animation of `font-size` on a parent) isn't seen until one of them fires; call `applyOpszStepper` yourself in that case. The size used is the computed `font-size`, so CSS `zoom` and transforms don't change the cut. opszStepper doesn't move the page's scroll position: browsers' scroll anchoring handles the small reflow a swap can cause.
 
 **`document.fonts.load()` is not awaited.** The cut swap is immediate — opszStepper sets `font-family` and the browser handles the font load. If a cut's font file has not yet loaded, the browser will show a fallback until it arrives (standard FOUT behaviour). If you need to eliminate FOUT, preload each cut's font file in the document `<head>` using `<link rel="preload" as="font">`. opszStepper does not manage font loading.
 
-**Original fontFamily is saved and restored.** When `removeOpszStepper(el)` or the stop function from `startOpszStepper` is called, the element's `style.fontFamily` is reset to exactly the value it had before the first call. If the element had no inline `fontFamily`, it is restored to an empty string (clearing the inline property, deferring to the stylesheet).
+**Original fontFamily is saved and restored.** When `removeOpszStepper(el)` or the stop function from `startOpszStepper` is called, the element's `style.fontFamily` is reset to exactly the value it had before the first call. If the element had no inline `fontFamily`, the inline property is removed (deferring to the stylesheet), and an element that had no `style` attribute is left without one.
 
 ---
 
