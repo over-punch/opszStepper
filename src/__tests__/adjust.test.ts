@@ -193,7 +193,7 @@ describe('opszStepper', () => {
 	})
 
 	// 15. Hysteresis: moving UP — font-size barely past boundary does not trigger switch
-	it('hysteresis holds cut when moving up but not past threshold', () => {
+	it('hysteresis holds cut when moving up but not past threshold', async () => {
 		// Start in Text cut (20px). Boundary to Display is at minSize=28.
 		// With hysteresis=2, need fontSize > 28+2=30 to switch to Display.
 		stubFontSize(20)
@@ -212,6 +212,7 @@ describe('opszStepper', () => {
 		// Move to 29px — raw index is Display, but only 1px past boundary; threshold is 30
 		stubFontSize(29)
 		roCallback!([{ contentRect: { width: 100 } } as ResizeObserverEntry], null as unknown as ResizeObserver)
+		await Promise.resolve() // the check runs in a batched microtask
 
 		// Should still be Text — not past the hysteresis threshold
 		expect(el.style.fontFamily).toBe(normFontFamily('Halyard Text, sans-serif'))
@@ -219,7 +220,7 @@ describe('opszStepper', () => {
 	})
 
 	// 16. Hysteresis: moving UP — font-size clearly past threshold triggers switch
-	it('hysteresis switches cut when moving up past threshold', () => {
+	it('hysteresis switches cut when moving up past threshold', async () => {
 		// Start in Text cut (20px). With hysteresis=2, need > 30px to switch to Display.
 		stubFontSize(20)
 		const el = makeElement()
@@ -237,13 +238,14 @@ describe('opszStepper', () => {
 		// Move to 31px — clearly past the 30px threshold
 		stubFontSize(31)
 		roCallback!([{ contentRect: { width: 100 } } as ResizeObserverEntry], null as unknown as ResizeObserver)
+		await Promise.resolve() // the check runs in a batched microtask
 
 		expect(el.style.fontFamily).toBe(normFontFamily('Halyard Display, sans-serif'))
 		stop()
 	})
 
 	// 17. Hysteresis: moving DOWN — font-size barely below boundary does not trigger switch
-	it('hysteresis holds cut when moving down but not past threshold', () => {
+	it('hysteresis holds cut when moving down but not past threshold', async () => {
 		// Start in Display cut (32px). Current cut minSize=28. With hysteresis=2,
 		// need fontSize < 28-2=26 to switch down to Text.
 		stubFontSize(32)
@@ -262,6 +264,7 @@ describe('opszStepper', () => {
 		// Move to 27px — raw index is Text, but 27 < 26 is false; threshold is 26
 		stubFontSize(27)
 		roCallback!([{ contentRect: { width: 100 } } as ResizeObserverEntry], null as unknown as ResizeObserver)
+		await Promise.resolve() // the check runs in a batched microtask
 
 		// Should still be Display — not past the downward hysteresis threshold
 		expect(el.style.fontFamily).toBe(normFontFamily('Halyard Display, sans-serif'))
@@ -269,7 +272,7 @@ describe('opszStepper', () => {
 	})
 
 	// 18. Hysteresis: moving DOWN — font-size clearly past threshold triggers switch
-	it('hysteresis switches cut when moving down past threshold', () => {
+	it('hysteresis switches cut when moving down past threshold', async () => {
 		// Start in Display cut (32px). Current cut minSize=28. With hysteresis=2,
 		// need fontSize < 26 to switch down to Text.
 		stubFontSize(32)
@@ -288,6 +291,7 @@ describe('opszStepper', () => {
 		// Move to 25px — clearly past the 26px downward threshold
 		stubFontSize(25)
 		roCallback!([{ contentRect: { width: 100 } } as ResizeObserverEntry], null as unknown as ResizeObserver)
+		await Promise.resolve() // the check runs in a batched microtask
 
 		expect(el.style.fontFamily).toBe(normFontFamily('Halyard Text, sans-serif'))
 		stop()
@@ -335,7 +339,7 @@ describe('opszStepper', () => {
 	})
 
 	// 21. startOpszStepper onCutChange fires when ResizeObserver triggers a cut switch
-	it('startOpszStepper calls onCutChange when ResizeObserver triggers cut switch', () => {
+	it('startOpszStepper calls onCutChange when ResizeObserver triggers cut switch', async () => {
 		stubFontSize(20)
 		const el = makeElement()
 
@@ -353,6 +357,7 @@ describe('opszStepper', () => {
 		// Move to 32px — should switch to Display and fire onCutChange
 		stubFontSize(32)
 		roCallback!([{ contentRect: { width: 100 } } as ResizeObserverEntry], null as unknown as ResizeObserver)
+		await Promise.resolve() // the check runs in a batched microtask
 
 		expect(onCutChange).toHaveBeenCalledOnce()
 		expect(onCutChange).toHaveBeenCalledWith(SAMPLE_CUTS[2])
