@@ -39,7 +39,8 @@ function parseOpszShorthand(spec: string, family: string, opszMin?: number, opsz
 		if (valuePart === undefined) continue
 		const opszValue = parseFloat(valuePart.trim())
 		if (isNaN(opszValue)) continue
-		const [minPart, maxPart] = range.split('-')
+		// Accept en and em dashes as range separators too (typographers type them).
+		const [minPart, maxPart] = range.replace(/[\u2013\u2014]/g, '-').split('-')
 		const min = parseFloat((minPart ?? '').trim())
 		const max = parseFloat((maxPart ?? '').trim())
 		const cut: OpszStepperCut = { family, opszValue }
@@ -67,11 +68,20 @@ function sanitiseJsonCuts(input: unknown): OpszStepperCut[] {
 		const e = entry as Record<string, unknown>
 		if (typeof e.family !== 'string') continue
 		const cut: OpszStepperCut = { family: e.family }
-		if (typeof e.minSize === 'number') cut.minSize = e.minSize
-		if (typeof e.maxSize === 'number') cut.maxSize = e.maxSize
-		if (typeof e.opszValue === 'number') cut.opszValue = e.opszValue
-		if (typeof e.opszMin === 'number') cut.opszMin = e.opszMin
-		if (typeof e.opszMax === 'number') cut.opszMax = e.opszMax
+		// Numbers written as strings ("13") are accepted; anything else non-numeric is reported.
+		const num = (key: string): number | undefined => {
+			const v = e[key]
+			if (v === undefined || v === null) return undefined
+			const n = typeof v === 'number' ? v : typeof v === 'string' && v.trim() !== '' ? Number(v) : NaN
+			if (Number.isFinite(n)) return n
+			console.warn(`OpszStepper: "${key}" in data-os-cuts must be a number; got ${JSON.stringify(v)} — ignoring it.`)
+			return undefined
+		}
+		const minSize = num('minSize'); if (minSize !== undefined) cut.minSize = minSize
+		const maxSize = num('maxSize'); if (maxSize !== undefined) cut.maxSize = maxSize
+		const opszValue = num('opszValue'); if (opszValue !== undefined) cut.opszValue = opszValue
+		const opszMin = num('opszMin'); if (opszMin !== undefined) cut.opszMin = opszMin
+		const opszMax = num('opszMax'); if (opszMax !== undefined) cut.opszMax = opszMax
 		cuts.push(cut)
 	}
 	return cuts
