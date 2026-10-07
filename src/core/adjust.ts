@@ -107,6 +107,12 @@ interface ElementState {
 	/** Values opszStepper last wrote, to tell its own writes from the author's later changes. */
 	writtenFVS: string | null
 	writtenStyleAttr: string | null
+	/**
+	 * True once something other than opszStepper has changed the style attribute since the first
+	 * write (the author set a new inline font-size, React re-rendered a style prop). From then on
+	 * origStyleAttr is out of date, so a restore undoes only opszStepper's own properties.
+	 */
+	styleAttrChanged: boolean
 	/** Whether a live watcher (startOpszStepper) is attached. */
 	live: boolean
 	stop?: OpszStepperStop
@@ -142,7 +148,7 @@ function ensureState(el: HTMLElement, options: OpszStepperOptions): ElementState
 			origFVS: readInline(el, 'font-variation-settings'),
 			origStyleAttr: el.getAttribute('style'),
 			baseFVS: computedFVS(el),
-			writtenFVS: null, writtenStyleAttr: null, live: false,
+			writtenFVS: null, writtenStyleAttr: null, styleAttrChanged: false, live: false,
 		}
 		states.set(el, s)
 	} else {
@@ -173,6 +179,9 @@ function withOpsz(base: string, value: number): string {
  */
 function writeCut(el: HTMLElement, s: ElementState, index: number): void {
 	const cut = s.cuts[index].cut
+	// The style attribute isn't what opszStepper last left there: someone else changed an inline
+	// style (often the font-size that triggered this write), so the saved attribute is out of date.
+	if (el.getAttribute('style') !== (s.writtenStyleAttr === null ? s.origStyleAttr : s.writtenStyleAttr)) s.styleAttrChanged = true
 	// The author changed font-variation-settings since the last write: that's the new base.
 	if (s.writtenFVS !== null && el.style.getPropertyValue('font-variation-settings') !== s.writtenFVS) {
 		s.origFVS = readInline(el, 'font-variation-settings')
@@ -200,11 +209,12 @@ function writeCut(el: HTMLElement, s: ElementState, index: number): void {
 function restore(el: HTMLElement): void {
 	const s = states.get(el)
 	if (!s) return
-	if (s.writtenStyleAttr !== null && el.getAttribute('style') === s.writtenStyleAttr) {
-		// Nothing else changed the style attribute since: put back exactly what was there.
+	if (s.writtenStyleAttr !== null && !s.styleAttrChanged && el.getAttribute('style') === s.writtenStyleAttr) {
+		// Nothing else has changed the style attribute since the first write: put back exactly what was there.
 		if (s.origStyleAttr === null) el.removeAttribute('style')
 		else el.setAttribute('style', s.origStyleAttr)
 	} else {
+		// Other inline styles changed while opszStepper ran: undo only its own properties and keep the rest.
 		writeInline(el, 'font-family', s.origFamily)
 		if (s.writtenFVS !== null) writeInline(el, 'font-variation-settings', s.origFVS)
 		if (s.origStyleAttr === null && !el.getAttribute('style')) el.removeAttribute('style')
