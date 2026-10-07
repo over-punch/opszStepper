@@ -1,3 +1,4 @@
+// Open Graph image for opszstepper.com (1200×630, rendered once at build time by Satori).
 import { ImageResponse } from 'next/og'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -13,12 +14,12 @@ export default async function Image() {
 	const interLight = await readFile(join(process.cwd(), 'public/fonts/inter-300.woff'))
 	return new ImageResponse(
 		(
-			// Background matches --background: oklch(0.12 0.04 243) → #243b00
+			// Background matches --background: oklch(0.32 0.10 128) → #243b00
 			<div style={{ background: '#243b00', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '72px 80px', fontFamily: 'Inter, sans-serif' }}>
 				{/* Eyebrow label — muted (#b9c1b0) */}
 				<span style={{ fontSize: 13, letterSpacing: '0.18em', color: '#b9c1b0', textTransform: 'uppercase' }}>opsz stepper</span>
 				<div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-					{/* Decorative bar chart — accent colour stays, bar dim for inactive bars */}
+					{/* Three steps for three cuts, in the foreground colour at rising opacity */}
 					<div style={{ display: 'flex', gap: 12, marginBottom: 48, alignItems: 'flex-end' }}>
 						{[
 							{ h: 12, label: 'Micro', opacity: 0.35 },
@@ -26,8 +27,8 @@ export default async function Image() {
 							{ h: 52, label: 'Display', opacity: 0.9 },
 						].map(({ h, opacity }, i) => (
 							<div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-								{/* Accent colour matches hue 243 — #777c72 */}
-								<div style={{ width: 60, height: h, background: `rgba(0,119,187,${opacity})`, borderRadius: 4 }} />
+								{/* Foreground (#f3f6f1) so the bars sit in the page's green theme */}
+								<div style={{ width: 60, height: h, background: `rgba(243,246,241,${opacity})`, borderRadius: 4 }} />
 							</div>
 						))}
 					</div>

@@ -1,12 +1,13 @@
+// Root layout for opszstepper.com: metadata, the demo's font families (next/font), header and JSON-LD.
 import type { Metadata } from "next"
 import "./globals.css"
-import { Inter, Cormorant, Cormorant_Garamond, Cormorant_SC } from "next/font/google"
+import { Inter, Cormorant, Cormorant_Garamond, Cormorant_SC, PT_Serif, PT_Serif_Caption } from "next/font/google"
 import SiteHeader from "../components/SiteHeader"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
-// Three Cormorant optical-size cuts — downloaded at build time, served locally
-// Note: Cormorant Display is not on Google Fonts; the base Cormorant is the display-oriented cut
+// Three Cormorant sibling families — downloaded at build time, served locally. They are not optical sizes
+// (Cormorant SC is small caps); the demo offers them as the "obvious swap" option and the hero title uses Cormorant.
 // Weights 300 and 400 only — 600/700 are unused by the demo and copy
 const cormorantDisplay = Cormorant({
 	subsets: ["latin"],
@@ -31,16 +32,34 @@ const cormorantSC = Cormorant_SC({
 	display: "swap",
 })
 
+// PT Serif and PT Serif Caption: one design drawn at two optical sizes and shipped as two families,
+// which is the case opszStepper exists for. The demo's default pair.
+const ptSerif = PT_Serif({
+	subsets: ["latin"],
+	weight: ["400"],
+	variable: "--font-pt-serif",
+	display: "swap",
+})
+
+const ptSerifCaption = PT_Serif_Caption({
+	subsets: ["latin"],
+	weight: ["400"],
+	variable: "--font-pt-serif-caption",
+	display: "swap",
+})
+
 // Stable module-level join — avoids per-request array allocation in RootLayout
 const FONT_CLASSES = [
 	inter.variable,
 	cormorantDisplay.variable,
 	cormorantGaramond.variable,
 	cormorantSC.variable,
+	ptSerif.variable,
+	ptSerifCaption.variable,
 ].join(" ")
 
 /** Shared description used across meta, OG, and Twitter cards */
-const DESCRIPTION = "Automatically swap between Micro, Text, and Display optical cuts as font-size changes. Fills the gap CSS font-optical-sizing can’t cover. React, vanilla JS, zero dependencies."
+const DESCRIPTION = "Automatically swap between a typeface’s optical-size families (Caption, Text, Display) as font-size changes. Fills the gap CSS font-optical-sizing can’t cover. React, vanilla JS, zero dependencies."
 
 export const metadata: Metadata = {
 	title: "Opsz Stepper — Optical font family hot-swap by font-size",

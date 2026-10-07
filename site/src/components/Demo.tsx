@@ -1,23 +1,77 @@
 "use client"
 
-// Interactive demo: drag font-size slider, move cursor, tilt device, or simulate AR viewing distance to watch opszStepper hot-swap between Cormorant cuts
+// Interactive demo: drag the font-size slider, move the cursor, tilt the device or simulate a viewing distance to watch opszStepper swap optical-size families (PT Serif Caption / PT Serif by default), with an optional one-cut comparison
 import { useState, useDeferredValue, useEffect, useCallback, useMemo } from "react"
 import { useMediaQuery, useClientValue } from "@/lib/clientValue"
 import { OpszStepperText } from "@overpunch/opszstepper"
 import type { OpszStepperCut } from "@overpunch/opszstepper"
 
-/** Three Cormorant optical cuts loaded via next/font — keys must match CSS variable names */
-const CUTS: OpszStepperCut[] = [
-	{ family: 'var(--font-cormorant-sc), serif',       maxSize: 16 },
-	{ family: 'var(--font-cormorant-garamond), serif', minSize: 16, maxSize: 36 },
-	{ family: 'var(--font-cormorant-display), serif',  minSize: 36 },
+/** Human-readable label for one cut: the chip name and a one-line description of the family. */
+interface CutLabel { name: string; subtitle: string }
+
+/** A set of families the demo can step between. Family strings use the next/font CSS variables from layout.tsx. */
+interface DemoFamily {
+	/** Stable key, also used for the typeface toggle. */
+	id: string
+	/** Button label. */
+	label: string
+	/** One line under the toggle saying what this set shows. */
+	blurb: string
+	/** The cuts passed to opszStepper (sizes in px). */
+	cuts: OpszStepperCut[]
+	/** Label for each cut, keyed by its family string. */
+	labels: Record<string, CutLabel>
+	/** The family the "one cut at every size" comparison panel uses, and its display name. */
+	single: { family: string; name: string }
+}
+
+/** The typeface sets offered by the demo. The first is the default. */
+const FAMILIES: DemoFamily[] = [
+	{
+		id: 'pt-serif',
+		label: 'PT Serif',
+		blurb: 'Real optical sizes: PT Serif Caption is the same design redrawn for small text and shipped as its own family.',
+		cuts: [
+			{ family: 'var(--font-pt-serif-caption), serif', maxSize: 16 },
+			{ family: 'var(--font-pt-serif), serif',         minSize: 16 },
+		],
+		labels: {
+			'var(--font-pt-serif-caption), serif': { name: 'Caption', subtitle: 'PT Serif Caption — wider, more open, drawn for small sizes' },
+			'var(--font-pt-serif), serif':         { name: 'Text',    subtitle: 'PT Serif — the text and headline cut' },
+		},
+		single: { family: 'var(--font-pt-serif), serif', name: 'PT Serif' },
+	},
+	{
+		id: 'cormorant',
+		label: 'Cormorant ×3',
+		blurb: 'Not optical sizes: three sibling Cormorant families (small caps, Garamond, Cormorant), used here because the swap is impossible to miss.',
+		cuts: [
+			{ family: 'var(--font-cormorant-sc), serif',       maxSize: 16 },
+			{ family: 'var(--font-cormorant-garamond), serif', minSize: 16, maxSize: 36 },
+			{ family: 'var(--font-cormorant-display), serif',  minSize: 36 },
+		],
+		labels: {
+			'var(--font-cormorant-sc), serif':       { name: 'Small',  subtitle: 'Cormorant SC — small caps' },
+			'var(--font-cormorant-garamond), serif': { name: 'Medium', subtitle: 'Cormorant Garamond' },
+			'var(--font-cormorant-display), serif':  { name: 'Large',  subtitle: 'Cormorant' },
+		},
+		single: { family: 'var(--font-cormorant-display), serif', name: 'Cormorant' },
+	},
 ]
 
-/** Human-readable label for each cut, keyed by family string */
-const CUT_LABELS: Record<string, { name: string; subtitle: string }> = {
-	'var(--font-cormorant-sc), serif':       { name: 'Micro',   subtitle: 'Cormorant SC — small caps, designed for small sizes' },
-	'var(--font-cormorant-garamond), serif': { name: 'Text',    subtitle: 'Cormorant Garamond — text optical size' },
-	'var(--font-cormorant-display), serif':  { name: 'Display', subtitle: 'Cormorant Display — display optical size' },
+/** The thresholds between a set's cuts, in px, smallest first (e.g. [16, 36]). */
+function thresholds(cuts: OpszStepperCut[]): number[] {
+	return cuts.map(c => c.minSize).filter((v): v is number => typeof v === 'number' && v > 0).sort((a, b) => a - b)
+}
+
+/** "16px" or "16px and 36px" for a set's thresholds. */
+function thresholdText(cuts: OpszStepperCut[]): string {
+	return thresholds(cuts).map(t => `${t}px`).join(' and ')
+}
+
+/** The cut whose [minSize, maxSize) range holds this size: what opszStepper picks before hysteresis. */
+function cutForSize(cuts: OpszStepperCut[], size: number): OpszStepperCut {
+	return cuts.find(c => size >= (c.minSize ?? 0) && size < (c.maxSize ?? Infinity)) ?? cuts[cuts.length - 1]
 }
 
 const DEMO_TEXT = `The geometry that works at twelve points becomes wrong at seventy-two. Type designers know this — it’s why they draw separate optical-size cuts. Stroke widths, apertures, spacing: all redrawn for the intended size.`
@@ -102,15 +156,13 @@ function Slider({ label, value, min, max, step, unit, onChange, subtitle, annota
 	)
 }
 
-/** Chip showing Micro / Text / Display — active one is fully opaque */
-function CutChips({ activeName }: { activeName: string }) {
-	const names = ['Micro', 'Text', 'Display']
+/** Chips naming each cut of the current set — the active one is fully opaque */
+function CutChips({ names, activeName }: { names: string[]; activeName: string }) {
 	return (
 		<div className="flex gap-2" role="group" aria-label="Active optical cut">
 			{names.map(name => (
 				<span
 					key={name}
-					role="status"
 					aria-current={name === activeName ? 'true' : undefined}
 					className="text-xs px-3 py-1 rounded-full border transition-opacity"
 					style={{
@@ -130,8 +182,13 @@ function CutChips({ activeName }: { activeName: string }) {
 export default function Demo() {
 	const [fontSize, setFontSize] = useState(32)
 	const [hysteresis, setHysteresis] = useState(1)
-	// Use CUTS[1] ?? CUTS[0] to guard against a future CUTS array with only one entry
-	const [activeCut, setActiveCut] = useState<OpszStepperCut>(CUTS[1] ?? CUTS[0])
+	// Which typeface set is stepped, and whether the one-cut comparison panel is shown
+	const [familyId, setFamilyId] = useState(FAMILIES[0].id)
+	const [compare, setCompare] = useState(false)
+	const family = FAMILIES.find(f => f.id === familyId) ?? FAMILIES[0]
+	const CUTS = family.cuts
+	// The cut opszStepper last reported (null until its first onCutChange)
+	const [activeCut, setActiveCut] = useState<OpszStepperCut | null>(null)
 
 	// Interaction modes — mutually exclusive
 	const [cursorMode, setCursorMode] = useState(false)
@@ -248,15 +305,18 @@ export default function Demo() {
 	}, [])
 
 	const activeMode = cursorMode || gyroMode || distanceMode
-	// Fall back to the cut whose family matches CUTS[1] to avoid a misleading 'Text' default on mount
-	const cutInfo = CUT_LABELS[activeCut.family] ?? CUT_LABELS[CUTS[1]?.family ?? ''] ?? { name: 'Text', subtitle: '' }
+	// Before the first onCutChange (and for the one render after switching sets) show the cut for the current size
+	const shownCut = activeCut && family.labels[activeCut.family] ? activeCut : cutForSize(CUTS, dFontSize)
+	const cutInfo = family.labels[shownCut.family] ?? { name: '', subtitle: '' }
+	const cutNames = CUTS.map(c => family.labels[c.family]?.name ?? '')
+	const limits = thresholdText(CUTS)
 
 	return (
 		<div className="w-full flex flex-col gap-8">
 			{/* Controls */}
 			<div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 				{!distanceMode && (
-					<Slider label="Font Size" value={fontSize} min={8} max={96} step={1} unit="px" onChange={setFontSize} title="Drag to change the rendered font size — opszStepper automatically switches to the appropriate optical cut at each threshold (16px and 36px)" />
+					<Slider label="Font Size" value={fontSize} min={8} max={96} step={1} unit="px" onChange={setFontSize} title={`Drag to change the rendered font size — opszStepper switches cut at each threshold (${limits})`} />
 				)}
 				{distanceMode && (
 					<Slider
@@ -274,6 +334,43 @@ export default function Demo() {
 					/>
 				)}
 				<Slider label="Hysteresis" value={hysteresis} min={0} max={4} step={0.5} unit="px" onChange={setHysteresis} subtitle="dead zone — size must overshoot the cut boundary by this much before switching" title="Set the dead zone around each cut boundary — font-size must overshoot by this many pixels before the optical cut switches, preventing rapid oscillation when size hovers near a threshold" />
+			</div>
+
+			{/* Typeface set and comparison toggle */}
+			<div className="flex flex-col gap-2">
+				<div className="flex flex-wrap items-center gap-3" role="group" aria-label="Typeface">
+					<span className="text-xs uppercase tracking-[0.18em] font-medium text-muted">Typeface</span>
+					{FAMILIES.map(f => (
+						<button
+							key={f.id}
+							onClick={() => setFamilyId(f.id)}
+							aria-label={`Use ${f.label} (${f.cuts.length} cuts)`}
+							aria-pressed={f.id === family.id}
+							className="text-xs px-3 py-1 rounded-full border transition-all"
+							style={{
+								borderColor: 'currentColor',
+								opacity: f.id === family.id ? 1 : 0.5,
+								background: f.id === family.id ? 'var(--btn-bg)' : 'transparent',
+							}}
+						>
+							{f.label}
+						</button>
+					))}
+					<button
+						onClick={() => setCompare(v => !v)}
+						aria-label={compare ? 'Hide the one-cut comparison' : `Compare with ${family.single.name} used at every size`}
+						aria-pressed={compare}
+						className="text-xs px-3 py-1 rounded-full border transition-all"
+						style={{
+							borderColor: 'currentColor',
+							opacity: compare ? 1 : 0.5,
+							background: compare ? 'var(--btn-bg)' : 'transparent',
+						}}
+					>
+						{compare ? 'Comparing' : 'Compare'}
+					</button>
+				</div>
+				<span className="text-xs text-subtle italic">{family.blurb}</span>
 			</div>
 
 			{/* Mode toggles */}
@@ -332,31 +429,53 @@ export default function Demo() {
 			{/* Active cut indicator — aria-live announces cut transitions to screen readers */}
 			<div className="flex flex-col gap-2" aria-live="polite" aria-atomic="true">
 				<div className="flex items-center gap-4 flex-wrap">
-					<CutChips activeName={cutInfo.name} />
+					<CutChips names={cutNames} activeName={cutInfo.name} />
 					<span className="text-xs text-muted">{cutInfo.subtitle}</span>
 				</div>
 			</div>
 
-			{/* Demo text — font-size controlled by slider or cursor or gyro */}
-			<div className="rounded-lg p-6" style={{ background: 'var(--panel)' }}>
-				<OpszStepperText
-					cuts={CUTS}
-					hysteresis={dHysteresis}
-					onCutChange={setActiveCut}
-					style={{
-						fontSize: `${dFontSize}px`,
-						lineHeight: 1.3,
-						margin: 0,
-					}}
-				>
-					{DEMO_TEXT}
-				</OpszStepperText>
+			{/* Demo text — font-size controlled by slider or cursor or gyro; with Compare on, a second panel holds one cut at every size */}
+			<div className={compare ? 'grid grid-cols-1 lg:grid-cols-2 gap-4' : 'grid grid-cols-1'}>
+				<div className="rounded-lg p-6 flex flex-col gap-3 min-w-0" style={{ background: 'var(--panel)' }}>
+					{compare && <span className="text-xs uppercase tracking-[0.18em] font-medium text-muted">With opszStepper — {cutInfo.subtitle.split(' — ')[0]}</span>}
+					<OpszStepperText
+						key={family.id}
+						cuts={CUTS}
+						hysteresis={dHysteresis}
+						onCutChange={setActiveCut}
+						style={{
+							fontSize: `${dFontSize}px`,
+							lineHeight: 1.3,
+							margin: 0,
+							overflowWrap: 'anywhere',
+						}}
+					>
+						{DEMO_TEXT}
+					</OpszStepperText>
+				</div>
+				{compare && (
+					<div className="rounded-lg p-6 flex flex-col gap-3 min-w-0" style={{ background: 'var(--panel)' }}>
+						<span className="text-xs uppercase tracking-[0.18em] font-medium text-muted">One cut at every size — {family.single.name}</span>
+						<p
+							aria-label={`The same text set in ${family.single.name} at every size, for comparison`}
+							style={{
+								fontFamily: family.single.family,
+								fontSize: `${dFontSize}px`,
+								lineHeight: 1.3,
+								margin: 0,
+								overflowWrap: 'anywhere',
+							}}
+						>
+							{DEMO_TEXT}
+						</p>
+					</div>
+				)}
 			</div>
 
 			{/* Cut reference legend */}
-			<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-muted">
+			<div className={`grid grid-cols-1 ${CUTS.length === 2 ? 'sm:grid-cols-2' : 'sm:grid-cols-3'} gap-3 text-xs text-muted`}>
 				{CUTS.map((cut) => {
-					const info = CUT_LABELS[cut.family]
+					const info = family.labels[cut.family]
 					const range = cut.minSize !== undefined && cut.maxSize !== undefined
 						? `${cut.minSize}px – ${cut.maxSize}px`
 						: cut.maxSize !== undefined
@@ -379,7 +498,7 @@ export default function Demo() {
 						: gyroMode
 						? 'Tilt device toward you for smaller sizes, upright for larger.'
 						: 'On smart glasses, AR-anchored text at 20 cm appears huge — at 2 m it appears tiny. The Distance slider simulates how far away the text is: as distance grows, the apparent size shrinks and opszStepper swaps to a finer optical cut.'
-					: 'Drag the font-size slider to cross the 16px and 36px thresholds — watch the typeface change. The hysteresis slider sets the dead zone: font-size must overshoot the boundary by that many pixels before the cut switches, preventing oscillation at the edge. On smartwatches and micro-displays, optical cut selection is non-negotiable — the difference between a text cut and a display cut at 14px is the difference between legible and illegible.'}
+					: `Drag the font-size slider across ${limits} and watch the family change. The hysteresis slider sets the dead zone: the size must pass the boundary by that many pixels before the cut switches, which prevents oscillation at the edge. Turn on Compare to see the same text held in one cut. On smartwatches and micro-displays, optical cut selection is non-negotiable — the difference between a text cut and a display cut at 14px is the difference between legible and illegible.`}
 			</p>
 		</div>
 	)
