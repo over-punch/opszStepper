@@ -1,6 +1,6 @@
 {
 	"name": "@overpunch/opszstepper",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"description": "Multi-cut optical family hot-swap by font-size — automatically applies Micro, Text, or Display cuts based on the element's computed font-size",
 	"type": "module",
 	"main": "dist/index.cjs",
