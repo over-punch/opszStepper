@@ -1,17 +1,15 @@
 <!doctype html>
 <!-- README Studio capture page for opszStepper.
-     Renders the same word at three sizes with the matching Cormorant optical cut,
-     plus a one-cut vs. opszStepper comparison. Screenshotted by scripts/capture.mjs. -->
+     Runs the built library (dist/core.js) on PT Serif / PT Serif Caption: one design drawn at two
+     optical sizes and shipped as two families. Scenes: the cut picked at three sizes, and one cut
+     scaled down vs. the cut opszStepper picks. Screenshotted by scripts/capture.mjs. -->
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<!-- Three real optical cuts of Cormorant — the same families the live demo uses.
-     Micro  → Cormorant SC (small caps, drawn for small sizes)
-     Text   → Cormorant Garamond (text optical size)
-     Display→ Cormorant (display-oriented cut) -->
+<!-- PT Serif Caption (small sizes) and PT Serif (text and up) — the same pair the live demo uses by default. -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@300;400&family=Cormorant+Garamond:wght@300;400&family=Cormorant+SC:wght@300;400&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=PT+Serif&family=PT+Serif+Caption&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
 <style>
 	:root {
 		--bg: oklch(0.13 0.045 95);
@@ -47,33 +45,26 @@
 	}
 	.sub { font-size: 13px; color: var(--muted); }
 
-	/* ── Hero: one sentence, three sizes, each with its correct cut ── */
+	/* ── Hero: one sentence at three sizes; opszStepper sets the family on each .sample ── */
 	#hero { width: 1100px; }
-	#hero .row { display: flex; align-items: baseline; gap: 28px; padding: 14px 0; }
+	#hero .row { display: flex; align-items: baseline; gap: 28px; padding: 16px 0; }
 	#hero .row + .row { border-top: 1px solid oklch(0.24 0.035 95); }
-	#hero .meta { width: 168px; flex: none; }
+	#hero .meta { width: 190px; flex: none; }
 	#hero .meta .cut { font-size: 14px; font-weight: 500; color: var(--accent); }
 	#hero .meta .px { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
-	#hero .sample { line-height: 1.05; color: var(--fg); }
-	.micro   { font-family: "Cormorant SC", serif; font-weight: 400; }
-	.text    { font-family: "Cormorant Garamond", serif; font-weight: 400; }
-	.display { font-family: "Cormorant", serif; font-weight: 300; }
-	#hero .s-micro   { font-size: 15px; letter-spacing: 0.04em; }
-	#hero .s-text    { font-size: 24px; }
-	#hero .s-display { font-size: 60px; }
+	.sample { line-height: 1.2; color: var(--fg); font-family: "PT Serif", serif; }
 
-	/* ── Comparison: one cut at all sizes vs. opszStepper ── */
+	/* ── Comparison: PT Serif scaled down vs. the Caption cut opszStepper picks ── */
 	#compare { width: 1100px; display: flex; flex-direction: column; gap: 8px; }
 	#compare .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 18px; }
 	#compare .col-head { font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
 	#compare .col-head .bad { color: oklch(0.7 0.12 30); }
 	#compare .col-head .good { color: var(--accent); }
-	#compare .stack { display: flex; flex-direction: column; gap: 16px; }
-	#compare .line { line-height: 1; }
-	#compare .l-sm { font-size: 15px; }
-	#compare .l-md { font-size: 24px; }
-	#compare .l-lg { font-size: 52px; }
-	#compare .divider { width: 1px; background: oklch(0.26 0.04 95); }
+	#compare .para { font-size: 11px; line-height: 1.45; max-width: 420px; }
+	#compare .zoom-label { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 22px 0 6px; }
+	/* The 11px drawing enlarged 4x: same family as the paragraph above it, at 44px. */
+	#compare .zoom { font-size: 44px; line-height: 1.1; white-space: nowrap; }
+	.one-cut { font-family: "PT Serif", serif; }
 </style>
 </head>
 <body>
@@ -82,54 +73,65 @@
 	<div class="scene" id="hero">
 		<div class="label">opszStepper · the right optical cut at every size</div>
 		<div class="row">
-			<div class="meta"><div class="cut">Micro cut</div><div class="px">15px · &lt; 16px</div></div>
-			<div class="sample micro s-micro">Typography</div>
+			<div class="meta"><div class="cut" data-cut></div><div class="px">13px · cut for &lt; 16px</div></div>
+			<div class="sample stepped" style="font-size:13px">Optical sizes are different drawings</div>
 		</div>
 		<div class="row">
-			<div class="meta"><div class="cut">Text cut</div><div class="px">24px · 16–36px</div></div>
-			<div class="sample text s-text">Typography</div>
+			<div class="meta"><div class="cut" data-cut></div><div class="px">24px · cut for ≥ 16px</div></div>
+			<div class="sample stepped" style="font-size:24px">Optical sizes are different drawings</div>
 		</div>
 		<div class="row">
-			<div class="meta"><div class="cut">Display cut</div><div class="px">60px · ≥ 36px</div></div>
-			<div class="sample display s-display">Typography</div>
+			<div class="meta"><div class="cut" data-cut></div><div class="px">52px · cut for ≥ 16px</div></div>
+			<div class="sample stepped" style="font-size:52px">Optical sizes are different drawings</div>
 		</div>
 	</div>
 
 	<!-- COMPARISON -->
 	<div class="scene" id="compare">
-		<div class="label">why it matters</div>
-		<div class="sub">The same family scaled to every size vs. the correct optical cut per size.</div>
+		<div class="label">why it matters at 11px</div>
+		<div class="sub">One family scaled down vs. the cut drawn for small sizes. Same text, same font-size.</div>
 		<div class="grid">
 			<div>
-				<div class="col-head"><span class="bad">✕ One cut, scaled</span> — Display at all sizes</div>
-				<div class="stack">
-					<div class="line display l-sm">Editorial</div>
-					<div class="line display l-md">Editorial</div>
-					<div class="line display l-lg">Editorial</div>
-				</div>
+				<div class="col-head"><span class="bad">✕ One cut, scaled</span> — PT Serif at 11px</div>
+				<p class="para one-cut">The geometry that works at seventy-two points is wrong at eight. Stroke widths, apertures and spacing are all redrawn for the intended size.</p>
+				<div class="zoom-label">The same drawing, enlarged 4×</div>
+				<div class="zoom one-cut">Stroke widths</div>
 			</div>
-			<div style="position:relative">
-				<div class="col-head"><span class="good">✓ opszStepper</span> — cut swapped per size</div>
-				<div class="stack">
-					<div class="line micro l-sm" style="letter-spacing:0.04em">Editorial</div>
-					<div class="line text l-md">Editorial</div>
-					<div class="line display l-lg">Editorial</div>
-				</div>
+			<div>
+				<div class="col-head"><span class="good">✓ opszStepper</span> — swaps to PT Serif Caption</div>
+				<p class="para sample stepped">The geometry that works at seventy-two points is wrong at eight. Stroke widths, apertures and spacing are all redrawn for the intended size.</p>
+				<div class="zoom-label">The same drawing, enlarged 4×</div>
+				<div class="zoom" data-follow>Stroke widths</div>
 			</div>
 		</div>
 	</div>
 
-<script>
-	// Signal readiness once all three optical-cut fonts have loaded and painted.
+<script type="module">
+	// Run the built library on every .stepped element, exactly as a page would.
+	import { startOpszStepper } from '/dist/core.js'
+
+	/** The two PT Serif cuts, with the boundary the live demo uses. */
+	const CUTS = [
+		{ family: '"PT Serif Caption", serif', maxSize: 16 },
+		{ family: '"PT Serif", serif', minSize: 16 },
+	]
+
+	/** Signals readiness once both cuts have loaded and opszStepper has set every family. */
 	window.__ready = (async () => {
-		await document.fonts.ready;
-		// Explicitly load each cut at a used size so networkidle + ready never races a swap font.
+		await document.fonts.ready
 		await Promise.all([
-			document.fonts.load('400 15px "Cormorant SC"'),
-			document.fonts.load('400 24px "Cormorant Garamond"'),
-			document.fonts.load('300 60px "Cormorant"'),
-		]);
-	})();
+			document.fonts.load('400 13px "PT Serif Caption"'),
+			document.fonts.load('400 24px "PT Serif"'),
+		])
+		for (const el of document.querySelectorAll('.stepped')) {
+			startOpszStepper(el, { cuts: CUTS })
+			// Label the hero rows with the family opszStepper actually applied.
+			const label = el.closest('.row')?.querySelector('[data-cut]')
+			if (label) label.textContent = el.style.fontFamily.split(',')[0].replaceAll('"', '')
+		}
+		// The enlarged specimen uses whatever family opszStepper applied to the paragraph above it.
+		for (const z of document.querySelectorAll('[data-follow]')) z.style.fontFamily = z.parentElement.querySelector('.stepped').style.fontFamily
+	})()
 </script>
 </body>
 </html>
