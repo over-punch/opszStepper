@@ -7,10 +7,10 @@
  * Two usage modes:
  * 1. Multi-family hot-swap (e.g. Halyard Micro / Text / Display):
  *    set `family` to the CSS font-family string for each cut. Leave `opszValue` unset.
- * 2. Single variable-font opsz axis (e.g. Recursive, Fraunces, Amstelvar):
+ * 2. Single variable-font opsz axis (e.g. Fraunces, Source Serif 4, Amstelvar):
  *    set `family` to the single variable font family, and set `opszValue` to the
- *    `opsz` axis value to apply at this cut. The tool will write
- *    `font-variation-settings: "opsz" <value>` on the element.
+ *    `opsz` axis value to apply at this cut. The tool sets the `opsz` axis in the element's
+ *    `font-variation-settings`, keeping its other axes.
  *    Optionally provide `opszMin` and `opszMax` to clamp the value against the
  *    font's fvar axis range.
  */
@@ -29,8 +29,8 @@ export interface OpszStepperCut {
 	 * Optional `opsz` axis value to write as `font-variation-settings: "opsz" <value>`.
 	 * Use this when all cuts share one variable font and you want to drive the opsz axis
 	 * directly rather than hot-swapping font families.
-	 * When provided, `font-variation-settings: normal` is written first to clear any
-	 * inherited axis values before applying the new `opsz` value.
+	 * The `opsz` value is merged into the element's computed `font-variation-settings`,
+	 * so other axes (such as `wght`) are kept.
 	 * Clamped between `opszMin` and `opszMax` when those are supplied.
 	 */
 	opszValue?: number
@@ -52,7 +52,7 @@ export type OpszStepperStop = () => void
 /** Options controlling the opszStepper effect */
 export interface OpszStepperOptions {
 	/**
-	 * The optical size cuts, ordered from smallest to largest.
+	 * The optical size cuts, in any order (they are sorted by size).
 	 * Each cut defines a font-family string and the font-size range it applies to.
 	 * Ranges should be contiguous and non-overlapping.
 	 *
